@@ -3,11 +3,10 @@ import unittest
 from unittest import TestCase
 
 import pandas_datareader.data as web
+from pyalgotrade import strategy
 from pyalgotrade.barfeed import googlefeed
 from pyalgotrade.technical import rsi, ma
 from pyalgotrade.tools import googlefinance
-
-from pyalgotrade import strategy
 
 
 class MyStrategy(strategy.BacktestingStrategy):
@@ -32,7 +31,7 @@ class TestLoadData(TestCase):
         shanghai = web.DataReader('orcl', 'yahoo', start, end)
         shanghai.to_json('test1.json')
 
-    def run_strategy(self):
+    def test_run_strategy(self):
         # Load the yahoo feed from the CSV file
         feed = googlefeed.Feed()
         feed.addBarsFromCSV("orcl", "orcl-2000.csv")
