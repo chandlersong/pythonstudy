@@ -56,12 +56,8 @@ def run_strategy(smaPeriod):
 
     myStrategy.run()
 
-    plt = plotter.StrategyPlotter(myStrategy)
-
-    # Plot the simple returns on each bar.
-    plt.getOrCreateSubplot("returns").addDataSeries("Simple returns", returnsAnalyzer.getReturns())
     print("Final portfolio value: $%.2f" % myStrategy.getBroker().getEquity())
-    # Plot the strategy.
-    plt.plot()
+    boker = myStrategy.getBroker()
+    print("Boker: "+ str(boker.getCommission()))
 
 run_strategy(15)
