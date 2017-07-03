@@ -1,3 +1,6 @@
+import unittest
+from unittest import TestCase
+
 from pyalgotrade.barfeed import googlefeed
 from pyalgotrade.stratanalyzer import returns
 
@@ -17,7 +20,12 @@ def run_strategy(smaPeriod):
     myStrategy.run()
 
     print("Final portfolio value: $%.2f" % myStrategy.getBroker().getEquity())
-    boker = myStrategy.getBroker()
-    print("Boker: "+ str(boker.getCommission()))
 
-run_strategy(15)
+
+class Test_Trade(TestCase):
+    def test_hello_world(self):
+        run_strategy(15)
+
+
+if __name__ == '__main__':
+    unittest.main()

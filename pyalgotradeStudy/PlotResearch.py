@@ -1,28 +1,39 @@
-from pyalgotrade import strategy, plotter
+import unittest
+from unittest import TestCase
+
+from pyalgotrade import plotter
 from pyalgotrade.barfeed import googlefeed
 from pyalgotrade.stratanalyzer import returns
+
 from pyalgotradeStudy.Strategy import SMACrossOver
 
-feed = googlefeed.Feed()
-feed.addBarsFromCSV("orcl", "orcl-2000.csv")
 
-# Evaluate the strategy with the feed's bars.
-myStrategy = SMACrossOver(feed, "orcl", 20)
+class TestPlot(TestCase):
+    def test_hello_word(self):
+        feed = googlefeed.Feed()
+        feed.addBarsFromCSV("orcl", "orcl-2000.csv")
 
-# Attach a returns analyzers to the strategy.
-returnsAnalyzer = returns.Returns()
-myStrategy.attachAnalyzer(returnsAnalyzer)
+        # Evaluate the strategy with the feed's bars.
+        myStrategy = SMACrossOver(feed, "orcl", 20)
 
-# Attach the plotter to the strategy.
-plt = plotter.StrategyPlotter(myStrategy)
-# Include the SMA in the instrument's subplot to get it displayed along with the closing prices.
-plt.getInstrumentSubplot("orcl").addDataSeries("SMA", myStrategy.getSMA())
-# Plot the simple returns on each bar.
-plt.getOrCreateSubplot("returns").addDataSeries("Simple returns", returnsAnalyzer.getReturns())
+        # Attach a returns analyzers to the strategy.
+        returnsAnalyzer = returns.Returns()
+        myStrategy.attachAnalyzer(returnsAnalyzer)
 
-# Run the strategy.
-myStrategy.run()
-myStrategy.info("Final portfolio value: $%.2f" % myStrategy.getResult())
+        # Attach the plotter to the strategy.
+        plt = plotter.StrategyPlotter(myStrategy)
+        # Include the SMA in the instrument's subplot to get it displayed along with the closing prices.
+        plt.getInstrumentSubplot("orcl").addDataSeries("SMA", myStrategy.getSMA())
+        # Plot the simple returns on each bar.
+        plt.getOrCreateSubplot("returns").addDataSeries("Simple returns", returnsAnalyzer.getReturns())
 
-# Plot the strategy.
-plt.plot()
+        # Run the strategy.
+        myStrategy.run()
+        myStrategy.info("Final portfolio value: $%.2f" % myStrategy.getResult())
+
+        # Plot the strategy.
+        plt.plot()
+
+
+if __name__ == '__main__':
+    unittest.main()
