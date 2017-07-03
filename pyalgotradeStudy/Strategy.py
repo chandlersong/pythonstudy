@@ -3,8 +3,8 @@ from pyalgotrade.technical import ma, cross
 
 
 class SimpleStrategy(strategy.BacktestingStrategy):
-    def __init__(self, feed, instrument, smaPeriod):
-        super(SimpleStrategy, self).__init__(feed, 1000)
+    def __init__(self, feed, instrument, smaPeriod, brk=1000):
+        super(SimpleStrategy, self).__init__(feed, brk)
         self.__position = None
         self.__instrument = instrument
         # We'll use adjusted close values instead of regular close values.
@@ -41,6 +41,7 @@ class SimpleStrategy(strategy.BacktestingStrategy):
         elif bar.getPrice() < self.__sma[-1] and not self.__position.exitActive():
             self.__position.exitMarket()
 
+
 class SMACrossOver(strategy.BacktestingStrategy):
     def __init__(self, feed, instrument, smaPeriod):
         super(SMACrossOver, self).__init__(feed)
@@ -76,7 +77,7 @@ class SMACrossOver(strategy.BacktestingStrategy):
             self.__position.exitMarket()
 
         if cross.cross_below(self.__prices, self.__sma):
-            print("crocess below,prices %s, sma %s" % (bar.getClose(),self.__sma[-1]))
-            print("crocess below,prices %s, sma %s" % (self.__prices[-1],self.__sma[-1]))
+            print("crocess below,prices %s, sma %s" % (bar.getClose(), self.__sma[-1]))
+            print("crocess below,prices %s, sma %s" % (self.__prices[-1], self.__sma[-1]))
         elif cross.cross_above(self.__prices, self.__sma):
             print("crocess above,prices %s, sma %s" % (bar.getClose(), self.__sma[-1]))
