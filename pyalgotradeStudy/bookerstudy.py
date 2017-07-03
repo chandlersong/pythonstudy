@@ -22,7 +22,7 @@ class TestBoker(TestCase):
         sli_stra = slippage.NoSlippage()
         fill_stra.setSlippageModel(sli_stra)
 
-        brk = Broker(1000000, feed, broker_commission)
+        brk = Broker(1000, feed, broker_commission)
 
         myStrategy = SimpleStrategy(feed, "orcl", 15, brk)
 
