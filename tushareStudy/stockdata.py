@@ -37,5 +37,23 @@ class SinaData(TestCase):
         print(ts.get_h_data('600000',start='2017-06-21', end='2017-06-30'))
 
 
+class SinaData(TestCase):
+    def setUp(self):
+        print(ts.__version__)
+
+    def test_load_hist_data(self):
+        print(ts.get_h_data('600000',start='2017-06-21', end='2017-06-30'))
+
+class DataEyes(TestCase):
+    def setUp(self):
+        ts.set_token("5244a7ac2b89c58102d13f5c54975aa09a6086217dea64ce6ee13404cc7390bd")
+
+    def test_hello_world(self):
+        mt = ts.Master()
+        df = mt.TradeCal(exchangeCD='XSHG', beginDate='20150928', endDate='20151010',
+                         field='calendarDate,isOpen,prevTradeDate')
+        print(df)
+
+
 if __name__ == '__main__':
     unittest.main()
