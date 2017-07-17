@@ -20,6 +20,11 @@ class TencentData(TestCase):
         print("2016-10-20 30分钟")
         print(ts.get_k_data('600000', start='2016-10-20', end='2016-10-21', ktype='30', autype=None))
 
+
+    def test_5_m_mins_data(self):
+        print("2016-10-20 5分钟")
+        print(ts.get_k_data('600000', start='2016-10-20', end='2016-10-20', ktype='5', autype=None))
+
     def test_load_data_qfq(self):
         print("前复权")
         print(ts.get_k_data('600000', start='2017-06-21', end='2017-06-30'))
@@ -34,7 +39,11 @@ class SinaData(TestCase):
         print(ts.__version__)
 
     def test_load_hist_data(self):
-        print(ts.get_h_data('600000',start='2017-06-21', end='2017-06-30'))
+        print(ts.get_h_data('600096',start='2017-06-21', end='2017-06-30'))
+
+    def test_load_hist_data(self):
+        data = ts.get_hist_data('600096', start='2017-06-21', end='2017-06-30')
+        print(data)
 
 
 class SinaData(TestCase):
