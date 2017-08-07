@@ -2,7 +2,6 @@ import unittest
 from unittest import TestCase
 
 from numpy.matlib import randn
-
 from pandas import DataFrame
 
 
@@ -15,13 +14,13 @@ class TestDataFrameExample(TestCase):
         print("========================================================================")
 
     def test_loop_1(self):
-        data =  self.example.to_records()
+        data = self.example.to_records()
         record = data[0]
         print(type(record))
         print(record.A)
 
     def test_loop_2(self):
-        for index,row in self.example.iterrows():
+        for index, row in self.example.iterrows():
             print(index)
             print(type(index))
             print(row)
@@ -30,7 +29,6 @@ class TestDataFrameExample(TestCase):
     def test_add_column(self):
         self.example['new column'] = range(5)
         print(self.example)
-
 
 
 if __name__ == '__main__':
