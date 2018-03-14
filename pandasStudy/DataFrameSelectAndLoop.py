@@ -1,4 +1,8 @@
+import tempfile
 import unittest
+import os
+import pandas as pd
+import shutil
 from unittest import TestCase
 
 from numpy.matlib import randn
@@ -29,6 +33,18 @@ class TestDataFrameExample(TestCase):
     def test_add_column(self):
         self.example['new column'] = range(5)
         print(self.example)
+
+    def test_to_csv(self):
+        testfileName = tempfile.gettempdir() + "\\test"
+
+        if os.path.exists(testfileName):
+            shutil.rmtree(testfileName)
+        os.mkdir(testfileName)
+        testfileName = testfileName +"\\a.csv"
+        print(testfileName)
+
+        self.example.to_csv(testfileName,compression="gzip")
+        print(pd.read_csv(testfileName,index_col=0,compression="gzip"))
 
 
 if __name__ == '__main__':

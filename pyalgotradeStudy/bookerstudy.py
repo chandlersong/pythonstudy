@@ -33,6 +33,7 @@ class TestBoker(TestCase):
 
         print("Final portfolio value: %s" % myStrategy.getBroker().getEquity())
         print("commissions : %s" % trade_situation.getCommissionsForAllTrades())
+        print("profits:%s" % trade_situation.getProfits())
 
 
 if __name__ == '__main__':

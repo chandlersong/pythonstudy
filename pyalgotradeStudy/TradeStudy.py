@@ -19,7 +19,11 @@ def run_strategy(smaPeriod):
 
     myStrategy.run()
 
-    print("Final portfolio value: $%.2f" % myStrategy.getBroker().getEquity())
+    broker = myStrategy.getBroker()
+    print("Final portfolio value: $%.2f" % broker.getEquity())
+    print(dir(broker))
+    print("getPositions:{}".format(broker.getPositions()))
+    print("getActiveOrder:{}".format(broker.getActiveOrders()))
 
 
 class Test_Trade(TestCase):

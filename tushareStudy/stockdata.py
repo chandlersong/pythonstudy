@@ -1,7 +1,13 @@
+import tempfile
 import unittest
+import pandas as pd
 from unittest import TestCase
 
+import os
+
+import shutil
 import tushare as ts
+from pandas.util.testing import assert_frame_equal
 
 
 class TencentData(TestCase):
@@ -52,6 +58,27 @@ class SinaData(TestCase):
 
     def test_load_hist_data(self):
         print(ts.get_h_data('600000',start='2017-06-21', end='2017-06-30'))
+
+class SinaData(TestCase):
+    def setUp(self):
+        print(ts.__version__)
+
+    def test_load_hist_data_to_csv(self):
+        testfileName = tempfile.gettempdir() + "\\test"
+
+        if os.path.exists(testfileName):
+            shutil.rmtree(testfileName)
+        os.mkdir(testfileName)
+        testfileName = testfileName + "\\sina.csv"
+        print(testfileName)
+
+        data = ts.get_h_data('600000', start='2017-06-28', end='2017-06-30')
+        data.to_csv(testfileName, compression="gzip")
+        reader_data = pd.read_csv(testfileName, index_col=0, compression="gzip",parse_dates=True)
+        print(reader_data)
+
+        assert_frame_equal(data,reader_data)
+
 
 class DataEyes(TestCase):
     def setUp(self):
