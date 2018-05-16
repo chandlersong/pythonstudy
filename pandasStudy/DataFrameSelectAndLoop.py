@@ -3,6 +3,7 @@ import unittest
 import os
 import pandas as pd
 import shutil
+from urllib import request
 from unittest import TestCase
 
 from numpy.matlib import randn
@@ -45,6 +46,21 @@ class TestDataFrameExample(TestCase):
 
         self.example.to_csv(testfileName,compression="gzip")
         print(pd.read_csv(testfileName,index_col=0,compression="gzip"))
+
+    def test_read_csv_from_internet(self):
+        url = 'http://quotes.money.163.com/service/zcfzb_600073.html'
+        testfileName = tempfile.gettempdir() + "\\test"
+        if os.path.exists(testfileName):
+            shutil.rmtree(testfileName)
+        os.mkdir(testfileName)
+        testfileName = testfileName + "\\a.csv"
+        with request.urlopen(url) as web:
+            with open(testfileName, 'wb') as outfile:
+                outfile.write(web.read())
+
+        local = pd.read_csv(testfileName, encoding='gb2312',na_values='--')
+        print(local.drop(local.columns[len(local.columns)-1], axis=1).fillna(0))
+
 
 
 if __name__ == '__main__':

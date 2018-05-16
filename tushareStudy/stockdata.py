@@ -33,7 +33,7 @@ class TencentData(TestCase):
 
     def test_load_data_qfq(self):
         print("前复权")
-        print(ts.get_k_data('600000', start='2017-06-21', end='2017-06-30'))
+        print(ts.get_k_data('600096', start='2018-04-12', end='2018-04-13'))
 
     def test_5_min_data(self):
         print("2016-10-20 5分钟")
