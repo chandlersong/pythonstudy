@@ -53,14 +53,9 @@ class TestDataFrameExample(TestCase):
         if os.path.exists(testfileName):
             shutil.rmtree(testfileName)
         os.mkdir(testfileName)
-        testfileName = testfileName + "\\a.csv"
         with request.urlopen(url) as web:
-            with open(testfileName, 'wb') as outfile:
-                outfile.write(web.read())
-
-        local = pd.read_csv(testfileName, encoding='gb2312',na_values='--')
-        print(local.drop(local.columns[len(local.columns)-1], axis=1).fillna(0))
-
+            local = pd.read_csv(web, encoding='gb2312', na_values='--')
+            print(local.drop(local.columns[len(local.columns) - 1], axis=1).fillna(0))
 
 
 if __name__ == '__main__':
