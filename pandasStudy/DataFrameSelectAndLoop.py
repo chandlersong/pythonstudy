@@ -1,11 +1,11 @@
+import os
+import shutil
 import tempfile
 import unittest
-import os
-import pandas as pd
-import shutil
-from urllib import request
 from unittest import TestCase
+from urllib import request
 
+import pandas as pd
 from numpy.matlib import randn
 from pandas import DataFrame
 
@@ -48,14 +48,23 @@ class TestDataFrameExample(TestCase):
         print(pd.read_csv(testfileName,index_col=0,compression="gzip"))
 
     def test_read_csv_from_internet(self):
-        url = 'http://quotes.money.163.com/service/zcfzb_600073.html'
-        testfileName = tempfile.gettempdir() + "\\test"
-        if os.path.exists(testfileName):
-            shutil.rmtree(testfileName)
-        os.mkdir(testfileName)
-        with request.urlopen(url) as web:
-            local = pd.read_csv(web, encoding='gb2312', na_values='--')
-            print(local.drop(local.columns[len(local.columns) - 1], axis=1).fillna(0))
+        latest_report = '2018-03-31'
+        index_col = 0
+
+        with request.urlopen('http://quotes.money.163.com/service/zcfzb_600073.html') as web:
+            local = pd.read_csv(web, encoding='gb2312', na_values='--',index_col=index_col)
+            result = local.drop(local.columns[len(local.columns) - 1], axis=1).fillna(0)
+            print(result[latest_report])
+
+        with request.urlopen('http://quotes.money.163.com/service/xjllb_600073.html') as web:
+            local = pd.read_csv(web, encoding='gb2312', na_values='--',index_col=index_col)
+            result = local.drop(local.columns[len(local.columns) - 1], axis=1).fillna(0)
+            print(result[latest_report])
+
+        with request.urlopen('http://quotes.money.163.com/service/lrb_600073.html') as web:
+            local = pd.read_csv(web, encoding='gb2312', na_values='--', index_col=index_col)
+            result = local.drop(local.columns[len(local.columns) - 1], axis=1).fillna(0)
+            print(result[latest_report])
 
 
 if __name__ == '__main__':
