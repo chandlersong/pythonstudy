@@ -8,6 +8,7 @@ from urllib import request
 import pandas as pd
 from numpy.matlib import randn
 from pandas import DataFrame
+from pandas.util.testing import assert_series_equal, assert_frame_equal
 
 
 class TestDataFrameExample(TestCase):
@@ -41,23 +42,23 @@ class TestDataFrameExample(TestCase):
         if os.path.exists(testfileName):
             shutil.rmtree(testfileName)
         os.mkdir(testfileName)
-        testfileName = testfileName +"\\a.csv"
+        testfileName = testfileName + "\\a.csv"
         print(testfileName)
 
-        self.example.to_csv(testfileName,compression="gzip")
-        print(pd.read_csv(testfileName,index_col=0,compression="gzip"))
+        self.example.to_csv(testfileName, compression="gzip")
+        print(pd.read_csv(testfileName, index_col=0, compression="gzip"))
 
     def test_read_csv_from_internet(self):
         latest_report = '2018-03-31'
         index_col = 0
 
         with request.urlopen('http://quotes.money.163.com/service/zcfzb_600073.html') as web:
-            local = pd.read_csv(web, encoding='gb2312', na_values='--',index_col=index_col)
+            local = pd.read_csv(web, encoding='gb2312', na_values='--', index_col=index_col)
             result = local.drop(local.columns[len(local.columns) - 1], axis=1).fillna(0)
             print(result[latest_report])
 
         with request.urlopen('http://quotes.money.163.com/service/xjllb_600073.html') as web:
-            local = pd.read_csv(web, encoding='gb2312', na_values='--',index_col=index_col)
+            local = pd.read_csv(web, encoding='gb2312', na_values='--', index_col=index_col)
             result = local.drop(local.columns[len(local.columns) - 1], axis=1).fillna(0)
             print(result[latest_report])
 
@@ -65,6 +66,31 @@ class TestDataFrameExample(TestCase):
             local = pd.read_csv(web, encoding='gb2312', na_values='--', index_col=index_col)
             result = local.drop(local.columns[len(local.columns) - 1], axis=1).fillna(0)
             print(result[latest_report])
+
+    def test_read_csv_save(self):
+        latest_report = '2018-03-31'
+        index_col = 0
+
+        with request.urlopen('http://quotes.money.163.com/service/zcfzb_600073.html') as web:
+            local = pd.read_csv(web, encoding='gb2312', na_values='--', index_col=index_col)
+            result = local.drop(local.columns[len(local.columns) - 1], axis=1).fillna(0).apply(pd.to_numeric,
+                                                                                               errors='coerce')
+
+            testfileName = tempfile.gettempdir() + "\\test"
+
+            if os.path.exists(testfileName):
+                shutil.rmtree(testfileName)
+            os.mkdir(testfileName)
+            testfileName = testfileName + "\\a.gzip"
+            print(testfileName)
+            result.to_csv(testfileName, encoding='utf-8')
+
+            actual = pd.read_csv(testfileName, index_col=0).apply(pd.to_numeric, args=('coerce',))
+            print(actual[latest_report])
+            print(result[latest_report])
+
+            assert_series_equal(result[latest_report], actual[latest_report], check_dtype=False)
+            assert_frame_equal(result, actual)
 
 
 if __name__ == '__main__':
