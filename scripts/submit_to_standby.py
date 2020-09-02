@@ -2,20 +2,14 @@ import argparse
 import os
 import subprocess
 
+from scripts import find_workspace
+
 """
 FutureImprove:
 1. it can receive argument in the script
     - workspace
 
 """
-
-
-def _find_workspace():
-    result = os.path.abspath(os.path.dirname(__file__))
-    while result != "/":
-        result = os.path.abspath(os.path.dirname(result))
-        if os.path.exists(os.path.join(result, "setup.py")):
-            return result
 
 
 def _get_minikube_ip() -> str:
@@ -30,7 +24,7 @@ class MyWorkSpace:
         if custom_workspace:
             self.workspace = custom_workspace
         else:
-            self.workspace = _find_workspace()
+            self.workspace = find_workspace()
 
     def compose_app_name(self, app_name: str) -> str:
         return os.path.join(self.workspace, "sparkstudy", "apps", app_name + ".py")
