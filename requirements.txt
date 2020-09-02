@@ -1,0 +1,2 @@
+setuptools~=49.6.0
+pyspark~=3.0.0
