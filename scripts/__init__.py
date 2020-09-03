@@ -18,6 +18,22 @@ def find_workspace():
     return None
 
 
+def _compose_app_name(workspace: str, app_name: str) -> str:
+    return os.path.join(workspace, "sparkstudy", "apps", app_name + ".py")
+
+
+class MyWorkSpace:
+
+    def __init__(self, custom_workspace=None):
+        if custom_workspace:
+            self.workspace = custom_workspace
+        else:
+            self.workspace = find_workspace()
+
+    def compose_app_name(self, app_name: str) -> str:
+        return _compose_app_name(self.workspace, app_name)
+
+
 def get_kubernetes_address():
     minikube_ip = subprocess.Popen(["kubectl", "cluster-info"], stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                    encoding="utf-8")
@@ -83,4 +99,4 @@ class SparkSubmit:
 
     @property
     def python_file_path(self) -> str:
-        return os.path.join(self._workspace, "sparkstudy", "apps", self._name + ".py")
+        return _compose_app_name(self._workspace, self._name)
