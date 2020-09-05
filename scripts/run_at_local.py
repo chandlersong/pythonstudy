@@ -18,5 +18,7 @@ if __name__ == '__main__':
     commands = ["spark-submit",
                 "--master",
                 "local[3]",
+                "--conf",
+                "spark.eventLog.enabled=false",
                 app_full_path]
     subprocess.run(commands, cwd=workspace.workspace)

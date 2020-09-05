@@ -4,6 +4,7 @@ from sparkstudy.libs.tools import test_app
 
 logFile = "YOUR_SPARK_HOME/README.md"  # Should be some file on your system
 spark = SparkSession.builder.appName("SimpleApp").getOrCreate()
+spark.sparkContext.setLogLevel("ERROR")
 logData = spark.createDataFrame(["aaabbbb", "bbfbfb", "aaaaaaa"], "string").toDF("age").cache()
 
 numAs = logData.filter(test_app(logData, 'a')).count()
