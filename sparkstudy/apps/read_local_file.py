@@ -1,5 +1,6 @@
-from pyspark import SparkConf
-from pyspark.sql import SparkSession, DataFrame
+from pyspark.sql import DataFrame
+
+from sparkstudy.deploy.demo_sessions import DemoSQLSessionFactory
 
 
 def test_app(log_data: DataFrame, check_char: str = 'a'):
@@ -8,8 +9,8 @@ def test_app(log_data: DataFrame, check_char: str = 'a'):
 
 if __name__ == '__main__':
     logFile = "../../resource/people.csv"  # Should be some file on your system
-    conf = SparkConf().setMaster("local[3]").setAppName("MY First App")
-    spark = SparkSession.builder.config(conf=conf).getOrCreate()
+    sessionFactory = DemoSQLSessionFactory(name="local file")
+    spark = sessionFactory.build_session()
     logData = spark.read.text(logFile).cache()
 
     numAs = logData.filter(test_app(logData, "a")).count()
