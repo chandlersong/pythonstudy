@@ -2,7 +2,7 @@ import re
 import subprocess
 
 
-def get_kubernetes_address():
+def get_kubernetes_address() -> str:
     minikube_ip = subprocess.Popen(["kubectl", "cluster-info"], stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                    encoding="utf-8")
     outs, errs = minikube_ip.communicate(timeout=100)
