@@ -13,20 +13,31 @@ def calculate_tag(path: str) -> str:
     return result
 
 
+"""
+custom column of spark
+"""
 tags_define_column = udf(calculate_tag, StringType())
 
 if __name__ == '__main__':
     sessionFactory = DemoSQLSessionFactory(name="local csv")
     spark = sessionFactory.build_session()
     workspace = find_root()
+    """
+    Be careful!!! header="true" not use True
+    """
     df = spark.read.csv(os.path.join(workspace, "resource", "assertReport"), header="true",
                         inferSchema=True).withColumn(
         "tag", tags_define_column(input_file_name()))
 
-    print(df.dtypes)
-    df.show()
+    print("default partitions {}".format(df.rdd.getNumPartitions()))
+    df = df.repartition(300, "报告日期")
 
-    df = df.rdd.keyBy(lambda row: row["tag"])
-    # df.foreach(lambda key: print(key[0]))
-
-    print(type(df))
+    print(df.explain())
+    """
+    the partition is automatically. if you want use handle. use method in rdd
+    """
+    print("partitions by 报告日期 {}".format(df.rdd.getNumPartitions()))
+    """
+    parquet don't have header in file
+    """
+    df.write.option("header", "true").parquet("data", mode="overwrite")
