@@ -1,5 +1,5 @@
 from pyspark import SparkConf
-from pyspark.sql import SparkSession
+from pyspark.sql.session import SparkSession
 
 from sparkstudy.deploy.kubernetes_tools import get_kubernetes_address
 
