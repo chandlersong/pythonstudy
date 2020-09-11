@@ -60,6 +60,10 @@ class DataFrameDemos(TestCase):
         """
         print("partitions by 报告日期 {}".format(df.rdd.getNumPartitions()))
 
+    def test_df_pick_column(self):
+        df = self.df
+        print(df.select("tag").distinct().show())
+
 
 if __name__ == '__main__':
     unittest.main()
