@@ -12,3 +12,9 @@ def get_kubernetes_address() -> str:
     if item:
         return str(item.group())
     return None
+
+
+def get_minikube_ip() -> str:
+    minikube_ip = subprocess.Popen(["minikube", "ip"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding="utf-8")
+    outs, errs = minikube_ip.communicate(timeout=100)
+    return outs[:len(outs) - 1]

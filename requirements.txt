@@ -1,2 +1,4 @@
 setuptools~=49.6.0
 pyspark~=3.0.1
+hdfs~=2.5.8
+pandas~=1.1.2

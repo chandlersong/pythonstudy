@@ -2,6 +2,7 @@ import argparse
 import subprocess
 
 from scripts import MyWorkSpace
+from sparkstudy.deploy.kubernetes_tools import get_minikube_ip
 
 """
 FutureImprove:
@@ -11,17 +12,14 @@ FutureImprove:
 """
 
 
-def _get_minikube_ip() -> str:
-    minikube_ip = subprocess.Popen(["minikube", "ip"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding="utf-8")
-    outs, errs = minikube_ip.communicate(timeout=100)
-    return outs[:len(outs) - 1]
+
 
 
 def create_command_parser() -> argparse.Namespace:
     result = argparse.ArgumentParser(description='manual to this script')
     result.add_argument('--workspace', type=str, default=None)
     result.add_argument('--app', type=str, default="simple_app")
-    minikube_ip = _get_minikube_ip()
+    minikube_ip = get_minikube_ip()
     result.add_argument('--remote_server', type=str, default="spark://{}:{}".format(minikube_ip, 30083))
     return result.parse_args()
 
