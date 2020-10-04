@@ -31,7 +31,10 @@ class MyTestCase(unittest.TestCase):
         print(self._client.status("/user/hive/warehouse/pokes/kv1.txt"))
 
     def test_download_file(self):
-        self._client.download("/user/hive/warehouse/pokes","pokes")
+        self._client.download("/user/hive", "hive")
+
+    def test_upload_file(self):
+        self._client.upload("/user/hive", "hive/")
 
 
 if __name__ == '__main__':
