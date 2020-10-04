@@ -26,6 +26,13 @@ class MyTestCase(unittest.TestCase):
 
         self._client.delete('/helloworld.csv')
 
+    def test_print_status(self):
+        print(self._client.status("/user"))
+        print(self._client.status("/user/hive/warehouse/pokes/kv1.txt"))
+
+    def test_download_file(self):
+        self._client.download("/user/hive/warehouse/pokes","pokes")
+
 
 if __name__ == '__main__':
     unittest.main()
