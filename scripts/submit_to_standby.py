@@ -12,9 +12,6 @@ FutureImprove:
 """
 
 
-
-
-
 def create_command_parser() -> argparse.Namespace:
     result = argparse.ArgumentParser(description='manual to this script')
     result.add_argument('--workspace', type=str, default=None)
