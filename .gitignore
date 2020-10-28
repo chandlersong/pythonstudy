@@ -2,3 +2,4 @@
 .gradle/
 gradle/
 venv/
+.ipynb_checkpoints/

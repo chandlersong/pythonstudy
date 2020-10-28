@@ -8,7 +8,7 @@ def test_app(log_data: DataFrame, check_char: str = 'a'):
 
 
 if __name__ == '__main__':
-    logFile = "../../resource/people.csv"  # Should be some file on your system
+    logFile = "../../data/people.csv"  # Should be some file on your system
     sessionFactory = DemoSQLSessionFactory(name="local file")
     spark = sessionFactory.build_session()
     logData = spark.read.text(logFile).cache()

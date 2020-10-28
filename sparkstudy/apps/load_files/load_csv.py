@@ -33,7 +33,7 @@ class DataFrameDemos(TestCase):
         workspace = find_root()
         session_factory = DemoSQLSessionFactory(name="local csv")
         spark = session_factory.build_session()
-        self.df = spark.read.csv(os.path.join(workspace, "resource", "assertReport"), header="true",
+        self.df = spark.read.csv(os.path.join(workspace, "data", "assertReport"), header="true",
                                  inferSchema=True).withColumn(
             "tag", tags_define_column(input_file_name()))
 
