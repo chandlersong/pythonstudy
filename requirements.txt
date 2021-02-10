@@ -84,3 +84,4 @@ websocket-client==0.57.0
 wheel==0.34.2
 widgetsnbextension==3.5.1
 zipp==2.2.0
+avro-python3~=1.10.1

@@ -1,0 +1,50 @@
+[
+  {
+    "namespace": "example.avro",
+    "type": "record",
+    "name": "Address",
+    "fields": [
+      {
+        "name": "name",
+        "type": "string"
+      }
+    ]
+  },
+  {
+    "namespace": "example.avro",
+    "type": "record",
+    "name": "User",
+    "fields": [
+      {
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "name": "favorite_number",
+        "type": "int"
+      },
+      {
+        "name": "favorite_color",
+        "type": "string"
+      },
+      {
+        "name": "address",
+        "type": [
+          "null",
+          "Address"
+        ],
+        "default": null
+      },
+      {
+        "name": "createTimestamp",
+        "type": [
+          "null",
+          {
+            "type": "long",
+            "logicalType": "timestamp-millis"
+          }
+        ]
+      }
+    ]
+  }
+]
