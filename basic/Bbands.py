@@ -1,8 +1,17 @@
-from backtrader import Strategy
+import backtrader as bt
 from loguru import logger
 
 
-class BbandsStrategy(Strategy):
+class BbandsStrategy(bt.Strategy):
+    params = (
+        ('period', 15),
+    )
+
+    def __init__(self) -> None:
+        super().__init__()
+        logger.info(f"parameter is {self.p.period}")
+        self.sma = bt.talib.SMA(self.data, timeperiod=self.p.period)
+
     def next(self):
         # Simply log the closing price of the series from the reference
         # logger.debug(f'{self.datas[0].datetime.datetime()}-close:{self.datas[0].close[0]}')
@@ -10,12 +19,11 @@ class BbandsStrategy(Strategy):
 
 
 class StFetcher(object):
-    _STRATS = [BbandsStrategy, BbandsStrategy]
+    _STRATS = []
 
-    def __new__(self, *args, **kwargs):
-        logger.info(f"**kwargs is {kwargs}")
-        idx = kwargs.pop('idx')
-        logger.info(f"idx is {idx},{len(self._STRATS)}")
-        obj = self._STRATS[idx](*args, **kwargs)
-        logger.info(f"obj is {obj}")
-        return obj
+    def __init__(self):
+        logger.info(f"there are {len(self._STRATS)}")
+        self._STRATS = [BbandsStrategy, BbandsStrategy]
+
+    def __new__(cls, *args, **kwargs):
+        return BbandsStrategy(*args, **kwargs)
