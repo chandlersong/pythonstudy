@@ -23,11 +23,25 @@ class BbandsStrategy(bt.Strategy):
         self._upper = _bbands.upperband
         self._median = _bbands.middleband
         self._lower = _bbands.lowerband
+        self._over_upper = bt.indicators.CrossUp(self.data, self._upper)
+        self._over_lower = bt.indicators.CrossDown(self.data, self._lower)
+        self._cross_median = bt.indicators.CrossOver(self.data, self._median)
 
     def next(self):
-        # Simply log the closing price of the series from the reference
-        # logger.debug(f'{self.datas[0].datetime.datetime()}-close:{self.datas[0].close[0]}')
-        logger.info(f"upper is {self._upper[0]},median is {self._median[0]},lower is {self._lower[0]}")
+        data_ = self.data[0]
+        if self._over_upper[0]:
+            upper_ = self._upper[0]
+            if data_ < upper_:
+                logger.error(f"error,signal is {self._upper[0]}")
+            logger.info(f"create long signal,upper is {upper_},close is {data_}")
+        if self._over_lower[0]:
+            lower_ = self._lower[0]
+            if data_ > lower_:
+                logger.error(f"error,signal is {self._over_lower[0]}")
+            logger.info(f"create short signal,lower is {lower_},close is {data_}")
+        if self._cross_median[0] != 0.0:
+            logger.info(
+                f"ready close signal,{self._cross_median[0]},lower is {self._median[0]},close is {self.data[0]}")
 
 
 class StFetcher(object):
