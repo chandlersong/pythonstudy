@@ -20,24 +20,25 @@ class TestFutureStrategy(bt.Strategy):
 
 class FutureCase(unittest.TestCase):
     def test_something(self):
-        data = compose_test_data()
+        price = []
+        for i in range(1, 10):
+            value = 10 - i
+            price.append([value, 1.1 * value, 0.9 * value, value, value * 100])
         cerebro = bt.Cerebro()
         broker = cerebro.broker
         broker.setcash(100.0)
-        cerebro.adddata(data)
+        cerebro.adddata(compose_test_data(price))
         cerebro.addstrategy(TestFutureStrategy)
         cerebro.run()
         logger.info('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
 
 
-def compose_test_data() -> PandasData:
+def compose_test_data(price) -> PandasData:
     start = datetime.datetime(2023, 12, 1)
-    res = []
-    for i in range(1, 10):
-        value = 10-i
-        res.append([start + datetime.timedelta(days=i), value, 1.1 * value, 0.9 * value, value, value])
-
-    return PandasData(dataname=pd.DataFrame(res, columns=['datetime', 'open', 'high', 'low', 'close', 'volume']),
+    for idx,p in enumerate(price):
+        p.insert(0, start + datetime.timedelta(days=idx))
+    print(price)
+    return PandasData(dataname=pd.DataFrame(price, columns=['datetime', 'open', 'high', 'low', 'close', 'volume']),
                       datetime='datetime',
                       high='high',
                       low='low',
