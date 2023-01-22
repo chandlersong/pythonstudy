@@ -35,7 +35,7 @@ class TestOCOStrategy(bt.Strategy):
         logger.info(f'{date} 当前持仓量 {self.broker.getposition(self.data).size}')
 
         if date.day == 2:
-            # 用这个来开仓
+            # 用这个来开仓,止损，止盈等操作
             self.sell_bracket()
 
 
