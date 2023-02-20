@@ -27,6 +27,36 @@ class BbandsStrategy(bt.Strategy):
         self._over_lower = bt.indicators.CrossDown(self.data, self._lower)
         self._cross_median = bt.indicators.CrossOver(self.data, self._median)
 
+    def notify_order(self, order):
+        if order.status in [order.Submitted, order.Accepted]:
+            # Buy/Sell order submitted/accepted to/by broker - Nothing to do
+            return
+
+        # Check if an order has been completed
+        # Attention: broker could reject order if not enough cash
+        if order.status in [order.Completed]:
+            if order.isbuy():
+                logger.debug(
+                    'BUY EXECUTED, Price: %.2f, Cost: %.2f, Comm %.2f' %
+                    (order.executed.price,
+                     order.executed.value,
+                     order.executed.comm))
+
+                self.buyprice = order.executed.price
+                self.buycomm = order.executed.comm
+            else:  # Sell
+                logger.debug('SELL EXECUTED, Price: %.2f, Cost: %.2f, Comm %.2f' %
+                            (order.executed.price,
+                             order.executed.value,
+                             order.executed.comm))
+
+            self.bar_executed = len(self)
+
+        elif order.status in [order.Canceled, order.Margin, order.Rejected]:
+            logger.debug('Order Canceled/Margin/Rejected')
+
+        self.order = None
+
     def next(self):
         data_ = self.data[0]
         if self._over_upper[0]:
@@ -34,12 +64,15 @@ class BbandsStrategy(bt.Strategy):
             if data_ < upper_:
                 logger.error(f"error,signal is {self._upper[0]}")
             logger.debug(f"create long signal,upper is {upper_},close is {data_}")
+            self.buy()
         if self._over_lower[0]:
             lower_ = self._lower[0]
             if data_ > lower_:
                 logger.error(f"error,signal is {self._over_lower[0]}")
             logger.debug(f"create short signal,lower is {lower_},close is {data_}")
+            self.sell()
         if self._cross_median[0] != 0.0:
+            self.close()
             logger.debug(
                 f"ready close signal,{self._cross_median[0]},lower is {self._median[0]},close is {self.data[0]}")
 
