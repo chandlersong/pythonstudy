@@ -40,7 +40,7 @@ class MyTestCase(unittest.TestCase):
         cerebro.adddata(bt_data)
         cerebro.addstrategy(BbandsStrategy, period=5, bias=1.1)
         cerebro.run()
-        logger.info(f'Final Portfolio value: {cerebro.broker.getvalue()}')
+        logger.info(f'Final Portfolio profile: {cerebro.broker.getvalue() / 1000000.0}')
         logger.info(f'Final Portfolio cash: {cerebro.broker.getcash()}')
         logger.info(f'Final Portfolio position size: {cerebro.broker.getposition(0).size}')
 

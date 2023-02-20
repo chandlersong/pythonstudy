@@ -38,18 +38,20 @@ class BbandsStrategy(bt.Strategy):
         if order.status in [order.Completed]:
             if order.isbuy():
                 logger.debug(
-                    'BUY EXECUTED, Price: %.2f, Cost: %.2f, Comm %.2f' %
+                    'BUY EXECUTED, Price: %.2f, Cost: %.2f, Comm %.2f,date %s' %
                     (order.executed.price,
                      order.executed.value,
-                     order.executed.comm))
+                     order.executed.comm,
+                     self.data.num2date()))
 
                 self.buyprice = order.executed.price
                 self.buycomm = order.executed.comm
             else:  # Sell
-                logger.debug('SELL EXECUTED, Price: %.2f, Cost: %.2f, Comm %.2f' %
+                logger.debug('SELL EXECUTED, Price: %.2f, Cost: %.2f, Comm %.2f,date %s' %
                              (order.executed.price,
                               order.executed.value,
-                              order.executed.comm))
+                              order.executed.comm,
+                              self.data.num2date()))
 
             self.bar_executed = len(self)
 
