@@ -13,7 +13,7 @@ class MyTestCase(unittest.TestCase):
     def setUp(self) -> None:
         logger.remove()
         logger.add(sys.stderr, level="INFO")  # or sys.stdout or other file object
-        logger.add(f"log_{datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')}.log",
+        logger.add(f"logs/log_{datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')}.log",
                    level="DEBUG")  # or sys.stdout or other file object
 
     def test_bbands(self):
