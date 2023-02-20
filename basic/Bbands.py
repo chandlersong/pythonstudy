@@ -33,16 +33,15 @@ class BbandsStrategy(bt.Strategy):
             upper_ = self._upper[0]
             if data_ < upper_:
                 logger.error(f"error,signal is {self._upper[0]}")
-            #logger.debug(f"create long signal,upper is {upper_},close is {data_}")
+            logger.debug(f"create long signal,upper is {upper_},close is {data_}")
         if self._over_lower[0]:
             lower_ = self._lower[0]
             if data_ > lower_:
                 logger.error(f"error,signal is {self._over_lower[0]}")
-            #logger.debug(f"create short signal,lower is {lower_},close is {data_}")
+            logger.debug(f"create short signal,lower is {lower_},close is {data_}")
         if self._cross_median[0] != 0.0:
-            pass
-            # logger.debug(
-            #     f"ready close signal,{self._cross_median[0]},lower is {self._median[0]},close is {self.data[0]}")
+            logger.debug(
+                f"ready close signal,{self._cross_median[0]},lower is {self._median[0]},close is {self.data[0]}")
 
 
 class StFetcher(object):
