@@ -15,6 +15,7 @@ class FixMarginComm(CommInfoBase):
         ('percabs', True),
         ('leverage', 2),
         ('automargin', 0.1),
+        ('commission', 0.001)
     )
 
     def cashadjust(self, size, price, newprice):
