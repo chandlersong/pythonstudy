@@ -61,7 +61,10 @@ class BbandsStrategy(bt.Strategy):
         self.order = None
 
     def next(self):
-        data_ = self.data[0]
+        data_ = self.data.close[0]
+        logger.debug(
+            f"{self.data.num2date()},close is {data_}.upper:{self._upper[0]},lower:{self._lower[0]},midea:{self._median[0]}")
+        signal = None
         if self._over_upper[0]:
             upper_ = self._upper[0]
             if data_ < upper_:
@@ -69,6 +72,7 @@ class BbandsStrategy(bt.Strategy):
             logger.debug(f"create long signal,upper is {upper_},close is {data_}")
             size, price = self.cal_size_price(True)
             self.buy(size=size, price=price, exectype=Order.Limit)
+            signal = 1
         if self._over_lower[0]:
             lower_ = self._lower[0]
             if data_ > lower_:
@@ -76,10 +80,14 @@ class BbandsStrategy(bt.Strategy):
             logger.debug(f"create short signal,lower is {lower_},close is {data_}")
             size, price = self.cal_size_price(False)
             self.sell(size=size, price=price, exectype=Order.Limit)
+            signal = -1
         if self._cross_median[0] != 0.0:
             self.close()
             logger.debug(
                 f"ready close signal,{self._cross_median[0]},lower is {self._median[0]},close is {self.data[0]}")
+            signal = 0
+        logger.info(
+            f",{self.data.num2date()},{self.data.open[0]},{self.data.high[0]},{self.data.low[0]},{self.data.close[0]},{self._median[0]},{self._upper[0]},{self._lower[0]},{signal}")
 
     def cal_size_price(self, is_buy=True, over=0.01):
         if is_buy:
