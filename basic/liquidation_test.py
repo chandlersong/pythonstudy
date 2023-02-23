@@ -26,7 +26,7 @@ class TestLiquidationStrategy(bt.Strategy):
                     margin = -1
                 cal = CalculateCloseOut()
                 closeout_price = cal(self.broker.getcash(), abs(order.executed.size), order.executed.price, False)
-                self.buy(size=order.executed.size, price=closeout_price, exectype=Order.Limit)
+                self.buy(size=order.executed.size, price=closeout_price, exectype=Order.StopLimit)
                 logger.info(f"Liquidation prices is {closeout_price}")
                 logger.info('SELL EXECUTED, %.2f,Margin is %.2f' % (order.executed.price, margin))
         elif order.status in [order.Canceled, order.Margin, order.Rejected]:
@@ -40,7 +40,6 @@ class TestLiquidationStrategy(bt.Strategy):
 
         if date.day == 2:
             size = 25
-
             # self.sell_bracket(size=size, stopprice=closeout_price)
             self.sell(size=size)
 
