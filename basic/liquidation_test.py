@@ -26,7 +26,7 @@ class TestLiquidationStrategy(bt.Strategy):
                     margin = -1
                 cal = CalculateCloseOut()
                 closeout_price = cal(self.broker.getcash(), abs(order.executed.size), order.executed.price, False)
-                self.buy(size=order.executed.size, price=closeout_price, exectype=Order.StopLimit)
+                self.buy(size=order.executed.size, price=closeout_price, exectype=Order.Limit)
                 logger.info(f"Liquidation prices is {closeout_price}")
                 logger.info('SELL EXECUTED, %.2f,Margin is %.2f' % (order.executed.price, margin))
         elif order.status in [order.Canceled, order.Margin, order.Rejected]:
@@ -44,9 +44,6 @@ class TestLiquidationStrategy(bt.Strategy):
             # self.sell_bracket(size=size, stopprice=closeout_price)
             self.sell(size=size)
 
-        if date.day == 6:
-            self.close()
-
 
 class FutureCase(unittest.TestCase):
 
@@ -58,7 +55,7 @@ class FutureCase(unittest.TestCase):
         cerebro = bt.Cerebro()
         broker = cerebro.broker
         broker.setcash(100.0)
-        broker.addcommissioninfo(FixMarginComm(leverage=10, automargin=1))
+        broker.addcommissioninfo(FixMarginComm(leverage=10, commission=0))
         cerebro.adddata(compose_test_data(price))
         cerebro.addstrategy(TestLiquidationStrategy)
         cerebro.run()
