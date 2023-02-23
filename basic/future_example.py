@@ -13,7 +13,7 @@ from basic.future import CalculateCloseOut
 class FixMarginComm(CommInfoBase):
     params = (
         ('stocklike', False),
-        # ('commtype', CommInfoBase.COMM_PERC),
+        ('commtype', CommInfoBase.COMM_PERC),
         ('percabs', True),
         ('leverage', 2),
         ('automargin', 1),
