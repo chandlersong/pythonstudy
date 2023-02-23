@@ -1,30 +1,14 @@
-import datetime
 import unittest
 
-import pandas as pd
-import backtrader as bt
-from backtrader import CommInfoBase
+from backtrader import Order
 from loguru import logger
-from backtrader.feeds import PandasData
 
+import backtrader as bt
 from basic.future import CalculateCloseOut
+from basic.future_example import compose_test_data, FixMarginComm
 
 
-class FixMarginComm(CommInfoBase):
-    params = (
-        ('stocklike', False),
-        ('commtype', CommInfoBase.COMM_PERC),
-        ('percabs', True),
-        ('leverage', 2),
-        ('automargin', 1),
-        ('commission', 0.2)
-    )
-
-    def cashadjust(self, size, price, newprice):
-        return 0
-
-
-class TestFutureStrategy(bt.Strategy):
+class TestLiquidationStrategy(bt.Strategy):
 
     def notify_order(self, order):
         if order.status in [order.Submitted, order.Accepted]:
@@ -40,6 +24,10 @@ class TestFutureStrategy(bt.Strategy):
                 margin = order.executed.margin
                 if margin is None:
                     margin = -1
+                cal = CalculateCloseOut()
+                closeout_price = cal(self.broker.getcash(), abs(order.executed.size), order.executed.price, False)
+                self.buy(size=order.executed.size, price=closeout_price, exectype=Order.StopLimit)
+                logger.info(f"Liquidation prices is {closeout_price}")
                 logger.info('SELL EXECUTED, %.2f,Margin is %.2f' % (order.executed.price, margin))
         elif order.status in [order.Canceled, order.Margin, order.Rejected]:
             logger.info('Order Canceled/Margin/Rejected')
@@ -51,49 +39,27 @@ class TestFutureStrategy(bt.Strategy):
         logger.info(f'{date} 当前持仓量 {self.broker.getposition(self.data).size}')
 
         if date.day == 2:
-            self.sell(self.data0)
+            size = 25
 
-        if date.day == 5:
-            self.close(self.data0)
+            # self.sell_bracket(size=size, stopprice=closeout_price)
+            self.sell(size=size)
 
-
-
+        if date.day == 6:
+            self.close()
 
 
 class FutureCase(unittest.TestCase):
-    def test_something(self):
+
+    def test_liquidation(self):
         price = []
         for i in range(1, 10):
-            value = i*10
+            value = i
             price.append([value, 1.1 * value, 0.9 * value, value, value * 100])
         cerebro = bt.Cerebro()
         broker = cerebro.broker
         broker.setcash(100.0)
-        broker.addcommissioninfo(FixMarginComm())
+        broker.addcommissioninfo(FixMarginComm(leverage=10, automargin=1))
         cerebro.adddata(compose_test_data(price))
-        cerebro.addstrategy(TestFutureStrategy)
+        cerebro.addstrategy(TestLiquidationStrategy)
         cerebro.run()
         logger.info('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
-
-
-
-
-def compose_test_data(price) -> PandasData:
-    start = datetime.datetime(2023, 12, 1)
-    for idx, p in enumerate(price):
-        p.insert(0, start + datetime.timedelta(days=idx))
-    data = pd.DataFrame(price, columns=['datetime', 'open', 'high', 'low', 'close', 'volume'])
-    logger.info("prices:===========================")
-    logger.info(data)
-    logger.info("prices:===========================")
-    return PandasData(dataname=data,
-                      datetime='datetime',
-                      high='high',
-                      low='low',
-                      open='open',
-                      close='close',
-                      volume='volume')
-
-
-if __name__ == '__main__':
-    unittest.main()
