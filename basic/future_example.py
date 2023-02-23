@@ -15,13 +15,13 @@ class FixMarginComm(CommInfoBase):
         ('stocklike', False),
         ('commtype', CommInfoBase.COMM_PERC),
         ('percabs', True),
-        ('leverage', 2),
+        ('leverage', 1),
         ('automargin', 1),
-        ('commission', 0.2)
+        # ('margin', 2000),
+        # ('mult', 100),
+        ('commission', 0)
     )
 
-    def cashadjust(self, size, price, newprice):
-        return 0
 
 
 class TestFutureStrategy(bt.Strategy):
@@ -51,20 +51,16 @@ class TestFutureStrategy(bt.Strategy):
         logger.info(f'{date} 当前持仓量 {self.broker.getposition(self.data).size}')
 
         if date.day == 2:
-            self.sell(self.data0)
-
+            self.sell()
         if date.day == 5:
-            self.close(self.data0)
-
-
-
+            self.close()
 
 
 class FutureCase(unittest.TestCase):
     def test_something(self):
         price = []
         for i in range(1, 10):
-            value = i*10
+            value = i * 10
             price.append([value, 1.1 * value, 0.9 * value, value, value * 100])
         cerebro = bt.Cerebro()
         broker = cerebro.broker
@@ -74,8 +70,6 @@ class FutureCase(unittest.TestCase):
         cerebro.addstrategy(TestFutureStrategy)
         cerebro.run()
         logger.info('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
-
-
 
 
 def compose_test_data(price) -> PandasData:
