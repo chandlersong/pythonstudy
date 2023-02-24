@@ -7,6 +7,7 @@ from backtrader.feeds import PandasData
 from loguru import logger
 
 from basic.Bbands import BbandsStrategy
+from basic.future import FutureComm
 
 
 class MyTestCase(unittest.TestCase):
@@ -37,6 +38,7 @@ class MyTestCase(unittest.TestCase):
         cerebro = bt.Cerebro()
         broker = cerebro.broker
         broker.setcash(1000000.0)
+        broker.addcommissioninfo(FutureComm(leverage=3))
         cerebro.adddata(bt_data)
         cerebro.addstrategy(BbandsStrategy, period=5, bias=1.1)
         cerebro.run()

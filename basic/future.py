@@ -1,3 +1,6 @@
+from backtrader import CommInfoBase
+
+
 class CalculateCloseOut:
 
     def __init__(self):
@@ -10,3 +13,16 @@ class CalculateCloseOut:
             direction = 1
         return (cash - position * open_price * direction) / (
                 position * (self._min_margin_ratio + self._c_rate - direction))
+
+
+class FutureComm(CommInfoBase):
+    params = (
+        ('stocklike', False),
+        ('commtype', CommInfoBase.COMM_PERC),
+        ('percabs', True),
+        ('leverage', 1),
+        ('automargin', 1),
+        # ('margin', 2000),
+        # ('mult', 100),
+        ('commission', 0.001)
+    )

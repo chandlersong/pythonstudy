@@ -4,8 +4,8 @@ import backtrader as bt
 from backtrader import Order
 from loguru import logger
 
-from basic.future import CalculateCloseOut
-from basic.future_example import compose_test_data, FixMarginComm
+from basic.future import CalculateCloseOut, FutureComm
+from basic.future_example import compose_test_data
 
 
 class TestLiquidationStrategy(bt.Strategy):
@@ -60,7 +60,7 @@ class FutureCase(unittest.TestCase):
         cerebro = bt.Cerebro()
         broker = cerebro.broker
         broker.setcash(100.0)
-        broker.addcommissioninfo(FixMarginComm(leverage=10, commission=0))
+        broker.addcommissioninfo(FutureComm(leverage=10, commission=0))
         cerebro.adddata(compose_test_data(price))
         cerebro.addstrategy(TestLiquidationStrategy)
         cerebro.run()
