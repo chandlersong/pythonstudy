@@ -1,27 +1,12 @@
 import datetime
 import unittest
 
-import pandas as pd
 import backtrader as bt
-from backtrader import CommInfoBase
-from loguru import logger
+import pandas as pd
 from backtrader.feeds import PandasData
+from loguru import logger
 
-from basic.future import CalculateCloseOut
-
-
-class FixMarginComm(CommInfoBase):
-    params = (
-        ('stocklike', False),
-        ('commtype', CommInfoBase.COMM_PERC),
-        ('percabs', True),
-        ('leverage', 1),
-        ('automargin', 1),
-        # ('margin', 2000),
-        # ('mult', 100),
-        ('commission', 0)
-    )
-
+from basic.future import FutureComm
 
 
 class TestFutureStrategy(bt.Strategy):
@@ -65,7 +50,7 @@ class FutureCase(unittest.TestCase):
         cerebro = bt.Cerebro()
         broker = cerebro.broker
         broker.setcash(100.0)
-        broker.addcommissioninfo(FixMarginComm())
+        broker.addcommissioninfo(FutureComm())
         cerebro.adddata(compose_test_data(price))
         cerebro.addstrategy(TestFutureStrategy)
         cerebro.run()
