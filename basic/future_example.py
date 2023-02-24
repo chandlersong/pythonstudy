@@ -57,7 +57,7 @@ class TestFutureStrategy(bt.Strategy):
 
 
 class FutureCase(unittest.TestCase):
-    def test_something(self):
+    def test_future(self):
         price = []
         for i in range(1, 10):
             value = i * 10
