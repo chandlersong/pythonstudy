@@ -14,8 +14,33 @@ CLOSE_LONG = CLOSE + LONG
 CLOSE_SHORT = CLOSE + SHORT
 
 
+class ExportCSVtAnalysis(bt.analyzers.Analyzer):
+
+    def __init__(self):
+        self.rets = []
+
+    def next(self):
+        self.rets.append([
+            self.data.num2date(),
+            self.data.open[0],
+            self.data.high[0],
+            self.data.low[0],
+            self.data.close[0],
+            self.strategy._signal.median[0],
+            self.strategy._signal.upper[0],
+            self.strategy._signal.lower[0],
+            self.strategy._signal.signal[0],
+            self.strategy.broker.getposition(self.data).size,
+            self.strategy.broker.getcash(),
+            self.strategy.broker.getvalue(),
+        ])
+
+    def get_analysis(self):
+        return self.rets
+
+
 class CrossBbands(bt.Indicator):
-    lines = ('signal', 'median',)
+    lines = ('signal', 'median', 'upper', 'lower')
     params = (
         ('period', 15),
         ('bias', 1),
@@ -64,10 +89,8 @@ class CrossBbands(bt.Indicator):
             res = NO_SIGNAL
         self.lines.signal[0] = res
         self.lines.median[0] = self._median[0]
-        execute_date = self.data.num2date()
-        logger.debug(
-            f",{execute_date},{self.data.open[0]},{self.data.high[0]},{self.data.low[0]},"
-            f"{self.data.close[0]},{self._median[0]},{self._upper[0]},{self._lower[0]},{res}")
+        self.lines.upper[0] = self._upper[0]
+        self.lines.lower[0] = self._upper[0]
 
 
 class BbandsStrategy(bt.Strategy):
@@ -118,20 +141,22 @@ class BbandsStrategy(bt.Strategy):
             self.sell(size=size, price=price, exectype=Order.Limit)
         elif signal == CLOSE_LONG:
             price = self.datas[0].close * (1 + 0.001)
-            size = self.broker.getvalue() / price
+            size = self.broker.getvalue() / price + self.broker.getposition(self.data).size
             self.buy(size=size, price=price, exectype=Order.Limit)
         elif signal == CLOSE_SHORT:
             price = self.datas[0].close * (1 - 0.001)
-            size = self.broker.getvalue() / price
+            size = self.broker.getvalue() / price + self.broker.getposition(self.data).size
             self.sell(size=size, price=price, exectype=Order.Limit)
 
     def cal_size_price(self, is_buy=True, over=0.01):
+        commission_info = self.broker.getcommissioninfo(self.data).p
         if is_buy:
             price = self.datas[0].close * (1 + over)
         else:
             price = self.datas[0].close * (1 - over)
         # TODO 加入刑不行的取整逻辑
-        size = self.broker.getcash() / price
+        cash  = self.broker.getcash() * commission_info.leverage * (1 - commission_info.commission)
+        size = cash / price
         return size, price
 
 

@@ -6,7 +6,7 @@ import pandas as pd
 from backtrader.feeds import PandasData
 from loguru import logger
 
-from basic.Bbands import BbandsStrategy
+from basic.Bbands import BbandsStrategy, ExportCSVtAnalysis
 from basic.future import FutureComm
 
 
@@ -14,7 +14,8 @@ class MyTestCase(unittest.TestCase):
     def setUp(self) -> None:
         logger.remove()
         logger.add(sys.stderr, level="INFO")  # or sys.stdout or other file object
-        logger.add(f"logs/log_{datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')}.log",
+        self.timestamp = datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
+        logger.add(f"logs/log_{self.timestamp}.log",
                    level="DEBUG")  # or sys.stdout or other file object
 
     def test_bbands(self):
@@ -40,11 +41,17 @@ class MyTestCase(unittest.TestCase):
         broker.setcash(1000000.0)
         broker.addcommissioninfo(FutureComm(leverage=3))
         cerebro.adddata(bt_data)
+        cerebro.addanalyzer(ExportCSVtAnalysis, _name="csv")
         cerebro.addstrategy(BbandsStrategy, period=5, bias=1.1)
-        cerebro.run()
+        strat = cerebro.run(runonce=True)
         logger.info(f'Final Portfolio profile: {cerebro.broker.getvalue() / 1000000.0}')
         logger.info(f'Final Portfolio cash: {cerebro.broker.getcash()}')
         logger.info(f'Final Portfolio position size: {cerebro.broker.getposition(0).size}')
+        csv_export = strat[0].analyzers.csv
+        analysis = csv_export.get_analysis()
+        data = pd.DataFrame(analysis, columns=["timestamp", "open", "hign", "low", "close", "median", "upper", "lower",
+                                               "signal", "position", "cash","value"])
+        data.to_csv(f"logs/transaction_{self.timestamp}.csv")
 
 
 if __name__ == '__main__':
