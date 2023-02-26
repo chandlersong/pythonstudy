@@ -35,10 +35,10 @@ class TestFutureStrategy(bt.Strategy):
         logger.info(f'{date},当前总资产 {self.broker.getvalue()}')
         logger.info(f'{date} 当前持仓量 {self.broker.getposition(self.data).size}')
 
+        if date.day == 1:
+            self.sell(size=1)
         if date.day == 2:
-            self.sell()
-        if date.day == 5:
-            self.close()
+            self.buy(size=2)
 
 
 class FutureCase(unittest.TestCase):
@@ -50,7 +50,7 @@ class FutureCase(unittest.TestCase):
         cerebro = bt.Cerebro()
         broker = cerebro.broker
         broker.setcash(100.0)
-        broker.addcommissioninfo(FutureComm())
+        broker.addcommissioninfo(FutureComm(leverage=1, commission=0))
         cerebro.adddata(compose_test_data(price))
         cerebro.addstrategy(TestFutureStrategy)
         cerebro.run()
