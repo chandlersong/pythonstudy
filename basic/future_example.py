@@ -3,6 +3,7 @@ import unittest
 
 import backtrader as bt
 import pandas as pd
+from backtrader import Order
 from backtrader.feeds import PandasData
 from loguru import logger
 
@@ -36,9 +37,9 @@ class TestFutureStrategy(bt.Strategy):
         logger.info(f'{date} 当前持仓量 {self.broker.getposition(self.data).size}')
 
         if date.day == 1:
-            self.sell(size=1)
-        if date.day == 2:
-            self.buy(size=2)
+            self.sell(size=1, price=1, exectype=Order.Limit)
+        # if date.day == 2:
+        #     self.buy(size=2)
 
 
 class FutureCase(unittest.TestCase):
