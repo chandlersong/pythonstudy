@@ -45,6 +45,7 @@ class MyTestCase(unittest.TestCase):
         cerebro.addanalyzer(ExportCSVtAnalysis, _name="csv")
         cerebro.addanalyzer(OrdersAbnormalAnalysis, _name="abnormal_orders")
         cerebro.addstrategy(BbandsStrategy, period=5, bias=1.1)
+        cerebro.addsizer(bt.sizers.SizerFix, stake=20)
         strat = cerebro.run()
         logger.info(f'Final Portfolio profile: {cerebro.broker.getvalue() / 1000000.0}')
         logger.info(f'Final Portfolio cash: {cerebro.broker.getcash()}')

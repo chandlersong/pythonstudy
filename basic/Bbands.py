@@ -159,23 +159,29 @@ class BbandsStrategy(bt.Strategy):
     def next(self):
 
         signal = self._signal.signal[0]
-
+        position = self.broker.getposition(self.data).size
         if signal == CLOSE:
             self.close()
         elif signal == LONG:
-            size, price = self.cal_size_price(True)
-            self.buy(size=size, price=price, exectype=Order.Limit)
+            if position == 0:
+                size, price = self.cal_size_price(True)
+                self.buy(size=size, price=price, exectype=Order.Limit)
+            elif position < 0:
+                logger.warning(f"{self.data.num2date()},long signal ignore")
         elif signal == SHORT:
-            size, price = self.cal_size_price(False)
-            self.sell(size=size, price=price, exectype=Order.Limit)
+            if position == 0:
+                size, price = self.cal_size_price(False)
+                self.sell(size=size, price=price, exectype=Order.Limit)
+            elif position > 0:
+                logger.warning(f"{self.data.num2date()},sell signal ignore")
         elif signal == CLOSE_LONG:
-            price = self.datas[0].close * (1 + 0.001)
-            size = self.broker.getvalue() / price + self.broker.getposition(self.data).size
-            self.buy(size=size, price=price, exectype=Order.Limit)
+            if position <= 0:
+                size, price = self.cal_size_price(True)
+                self.buy(size=size - position, price=price, exectype=Order.Limit)
         elif signal == CLOSE_SHORT:
-            price = self.datas[0].close * (1 - 0.001)
-            size = self.broker.getvalue() / price + self.broker.getposition(self.data).size
-            self.sell(size=size, price=price, exectype=Order.Limit)
+            if position >= 0:
+                size, price = self.cal_size_price(False)
+                self.sell(size=size + position, price=price, exectype=Order.Limit)
 
     def cal_size_price(self, is_buy=True, over=0.01, cash_reduce=0.988):
         """
@@ -191,8 +197,8 @@ class BbandsStrategy(bt.Strategy):
         else:
             price = self.datas[0].close * (1 - over)
         # TODO 加入刑不行的取整逻辑
-        cash = self.broker.getcash() * commission_info.leverage * (1 - commission_info.commission * 2) * cash_reduce
-        size = math.floor(cash / price)
+        cash = self.broker.getvalue() * commission_info.leverage * (1 - commission_info.commission * 2)
+        size = cash / price - 2.5
         return size, price
 
 
