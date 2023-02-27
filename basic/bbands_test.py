@@ -1,12 +1,13 @@
 import datetime
 import sys
 import unittest
+
 import backtrader as bt
 import pandas as pd
 from backtrader.feeds import PandasData
 from loguru import logger
 
-from basic.Bbands import BbandsStrategy, ExportCSVtAnalysis
+from basic.Bbands import BbandsStrategy, ExportCSVtAnalysis, OrdersAbnormalAnalysis
 from basic.future import FutureComm
 
 
@@ -42,16 +43,23 @@ class MyTestCase(unittest.TestCase):
         broker.addcommissioninfo(FutureComm(leverage=3))
         cerebro.adddata(bt_data)
         cerebro.addanalyzer(ExportCSVtAnalysis, _name="csv")
+        cerebro.addanalyzer(OrdersAbnormalAnalysis, _name="abnormal_orders")
         cerebro.addstrategy(BbandsStrategy, period=5, bias=1.1)
         strat = cerebro.run(runonce=True)
         logger.info(f'Final Portfolio profile: {cerebro.broker.getvalue() / 1000000.0}')
         logger.info(f'Final Portfolio cash: {cerebro.broker.getcash()}')
         logger.info(f'Final Portfolio position size: {cerebro.broker.getposition(0).size}')
-        csv_export = strat[0].analyzers.csv
-        analysis = csv_export.get_analysis()
+        analysis = strat[0].analyzers.csv.get_analysis()
         data = pd.DataFrame(analysis, columns=["timestamp", "open", "hign", "low", "close", "median", "upper", "lower",
-                                               "signal", "position", "cash","value"])
+                                               "signal", "position", "cash", "value"])
         data.to_csv(f"logs/transaction_{self.timestamp}.csv")
+
+        analysis = strat[0].analyzers.abnormal_orders.get_analysis()
+        data = pd.DataFrame(analysis,
+                            columns=["timestamp", "position", "cash", "value", "pre_signal", "signal",
+                                     "order_prices", "order_size",
+                                     "order_value", "comm"])
+        data.to_csv(f"logs/abnormal_{self.timestamp}.csv")
 
 
 if __name__ == '__main__':

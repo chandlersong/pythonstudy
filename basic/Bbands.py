@@ -14,6 +14,33 @@ CLOSE_LONG = CLOSE + LONG
 CLOSE_SHORT = CLOSE + SHORT
 
 
+class OrdersAbnormalAnalysis(bt.analyzers.Analyzer):
+
+    def __init__(self):
+        self.rets = []
+
+    def notify_order(self, order):
+        if order.status in [order.Canceled, order.Margin, order.Rejected]:
+            self.rets.append(
+                [
+                    self.data.num2date(),
+                    self.strategy.broker.getposition(self.data).size,
+                    self.strategy.broker.getcash(),
+                    self.strategy.broker.getvalue(),
+                    self.strategy._signal.signal[-1],
+                    self.strategy._signal.signal[0],
+                    order.created.price,
+                    order.created.size,
+                    order.created.value,
+                    order.created.comm,
+
+                ]
+            )
+
+    def get_analysis(self):
+        return self.rets
+
+
 class ExportCSVtAnalysis(bt.analyzers.Analyzer):
 
     def __init__(self):
@@ -155,7 +182,7 @@ class BbandsStrategy(bt.Strategy):
         else:
             price = self.datas[0].close * (1 - over)
         # TODO 加入刑不行的取整逻辑
-        cash  = self.broker.getcash() * commission_info.leverage * (1 - commission_info.commission)
+        cash  = self.broker.getcash() * commission_info.leverage * (1 - commission_info.commission*2)
         size = cash / price
         return size, price
 
