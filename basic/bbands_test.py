@@ -7,7 +7,7 @@ import pandas as pd
 from backtrader.feeds import PandasData
 from loguru import logger
 
-from basic.Bbands import BbandsStrategy, ExportCSVtAnalysis, OrdersAbnormalAnalysis
+from basic.Bbands import BbandsStrategy, ExportCSVtAnalysis, OrdersAbnormalAnalysis, PercentSizerWithLeverage
 from basic.future import FutureComm
 
 
@@ -45,7 +45,7 @@ class MyTestCase(unittest.TestCase):
         cerebro.addanalyzer(ExportCSVtAnalysis, _name="csv")
         cerebro.addanalyzer(OrdersAbnormalAnalysis, _name="abnormal_orders")
         cerebro.addstrategy(BbandsStrategy, period=5, bias=1.1)
-        cerebro.addsizer(bt.sizers.SizerFix, stake=20)
+        cerebro.addsizer(PercentSizerWithLeverage, percents=98)
         strat = cerebro.run()
         logger.info(f'Final Portfolio profile: {cerebro.broker.getvalue() / 1000000.0}')
         logger.info(f'Final Portfolio cash: {cerebro.broker.getcash()}')
@@ -58,6 +58,7 @@ class MyTestCase(unittest.TestCase):
         analysis = strat[0].analyzers.abnormal_orders.get_analysis()
         data = pd.DataFrame(analysis,
                             columns=["timestamp", "position", "cash", "value", "pre_signal", "signal",
+                                     "close","next_open",
                                      "order_prices", "order_size",
                                      "order_value", "comm"])
         data.to_csv(f"logs/abnormal_{self.timestamp}.csv")

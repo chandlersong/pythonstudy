@@ -1,7 +1,4 @@
-import math
-
 import backtrader as bt
-from backtrader import Order
 from loguru import logger
 
 NO_SIGNAL = 0
@@ -14,6 +11,36 @@ SHORT = 4
 
 CLOSE_LONG = CLOSE + LONG
 CLOSE_SHORT = CLOSE + SHORT
+
+
+class PercentSizerWithLeverage(bt.Sizer):
+    '''This sizer return percents of available cash
+
+    Params:
+      - ``percents`` (default: ``20``)
+    '''
+
+    params = (
+        ('percents', 20),
+        ('retint', False),  # return an int size or rather the float value
+    )
+
+    def __init__(self):
+        pass
+
+    def _getsizing(self, comminfo, cash, data, isbuy):
+        position = self.broker.getposition(data)
+        if not position:
+            cash_with_leverage = cash * self.strategy.broker.getcommissioninfo(data).p.leverage
+            size = cash_with_leverage / data.close[0] * (
+                        self.params.percents / 100)
+        else:
+            size = position.size
+
+        if self.p.retint:
+            size = int(size)
+
+        return size
 
 
 class OrdersAbnormalAnalysis(bt.analyzers.Analyzer):
@@ -31,6 +58,8 @@ class OrdersAbnormalAnalysis(bt.analyzers.Analyzer):
                     self.strategy.broker.getvalue(),
                     self.strategy._signal.signal[-1],
                     self.strategy._signal.signal[0],
+                    self.data.close[0],
+                    self.data.open[0],
                     order.created.price,
                     order.created.size,
                     order.created.value,
@@ -164,24 +193,30 @@ class BbandsStrategy(bt.Strategy):
             self.close()
         elif signal == LONG:
             if position == 0:
-                size, price = self.cal_size_price(True)
-                self.buy(size=size, price=price, exectype=Order.Limit)
+                # size, price = self.cal_size_price(True)
+                # self.buy(size=size, price=price, exectype=Order.Limit)
+                self.buy()
             elif position < 0:
                 logger.warning(f"{self.data.num2date()},long signal ignore")
         elif signal == SHORT:
             if position == 0:
-                size, price = self.cal_size_price(False)
-                self.sell(size=size, price=price, exectype=Order.Limit)
+                # size, price = self.cal_size_price(False)
+                # self.sell(size=size, price=price, exectype=Order.Limit)
+                self.sell()
             elif position > 0:
                 logger.warning(f"{self.data.num2date()},sell signal ignore")
         elif signal == CLOSE_LONG:
             if position <= 0:
-                size, price = self.cal_size_price(True)
-                self.buy(size=size - position, price=price, exectype=Order.Limit)
+                # size, price = self.cal_size_price(True)
+                # self.buy(size=size - position, price=price, exectype=Order.Limit)
+                self.close()
+                self.buy()
         elif signal == CLOSE_SHORT:
             if position >= 0:
-                size, price = self.cal_size_price(False)
-                self.sell(size=size + position, price=price, exectype=Order.Limit)
+                # size, price = self.cal_size_price(False)
+                # self.sell(size=size + position, price=price, exectype=Order.Limit)
+                self.close()
+                self.sell()
 
     def cal_size_price(self, is_buy=True, over=0.01, cash_reduce=0.988):
         """
