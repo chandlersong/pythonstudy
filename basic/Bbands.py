@@ -218,23 +218,6 @@ class BbandsStrategy(bt.Strategy):
                 self.close()
                 self.sell()
 
-    def cal_size_price(self, is_buy=True, over=0.01, cash_reduce=0.988):
-        """
-
-        :param is_buy: 是否交易
-        :param over: 提高多少价格
-        :param cash_reduce: 为了防止保证金过少，故意留一点
-        :return:
-        """
-        commission_info = self.broker.getcommissioninfo(self.data).p
-        if is_buy:
-            price = self.datas[0].close * (1 + over)
-        else:
-            price = self.datas[0].close * (1 - over)
-        # TODO 加入刑不行的取整逻辑
-        cash = self.broker.getvalue() * commission_info.leverage * (1 - commission_info.commission * 2)
-        size = cash / price - 2.5
-        return size, price
 
 
 class StFetcher(object):
