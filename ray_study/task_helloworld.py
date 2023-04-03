@@ -33,6 +33,7 @@ def slow_function(n):
 
 
 object_refs = [slow_function.remote(n) for n in range(10)]
-ready_refs, remaining_refs = ray.wait(object_refs, num_returns=2, timeout=None)
-for ref in ready_refs:
-    print(ray.get(ref))
+ready_refs, remaining_refs = ray.wait(object_refs)
+while len(remaining_refs) != 0:
+    print(ray.get(ready_refs))
+    ready_refs, remaining_refs = ray.wait(remaining_refs)
