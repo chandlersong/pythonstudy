@@ -1,3 +1,5 @@
+import random
+
 import ray
 import time
 
@@ -24,13 +26,13 @@ assert ray.get(obj_ref) == 1
 
 
 @ray.remote
-def slow_function():
-    time.sleep(10)
-    return 1
+def slow_function(n):
+    time.sleep(random.randint(0, 9))
+    print(f"{n} sleep finish")
+    return n
 
 
-# Ray tasks are executed in parallel.
-# All computation is performed in the background, driven by Ray's internal event loop.
-for _ in range(4):
-    # This doesn't block.
-    print(ray.get(slow_function.remote()))
+object_refs = [slow_function.remote(n) for n in range(10)]
+ready_refs, remaining_refs = ray.wait(object_refs, num_returns=2, timeout=None)
+for ref in ready_refs:
+    print(ray.get(ref))
