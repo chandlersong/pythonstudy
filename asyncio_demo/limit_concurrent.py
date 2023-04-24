@@ -1,16 +1,22 @@
 import asyncio
 import random
+import time
+
+from loguru import logger
 
 limit = asyncio.Semaphore(100)
 
 
 async def _make_one_call(i):
     async with limit:
-        sleep_seconds = random.randint(0, 9)
-        res = f"task {i} sleep {sleep_seconds}"
-        print(res)
-        await asyncio.sleep(sleep_seconds)
-        return res
+        sleep_seconds = random.randint(2, 9)
+        loop = asyncio.get_running_loop()
+        logger.info(f"task {i} will be submit")
+        await loop.run_in_executor(None, time.sleep, sleep_seconds)
+
+        logger_text = f"task {i} sleep {sleep_seconds}"
+        logger.info(logger_text)
+        return logger_text
 
 
 async def make_async_call():
@@ -21,5 +27,5 @@ async def make_async_call():
 
 
 if __name__ == '__main__':
-    res = asyncio.get_event_loop().run_until_complete(make_async_call())
-    print(res)
+    print_text = asyncio.get_event_loop().run_until_complete(make_async_call())
+    print(print_text)
