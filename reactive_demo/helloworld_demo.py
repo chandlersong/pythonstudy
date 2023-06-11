@@ -9,7 +9,6 @@ def millis_since(t0):
     return int((time.time() - t0) * 1000)
 
 
-
 class MyTestCase(unittest.TestCase):
     def test_something(self):
         source = rx.of("Alpha", "Beta", "Gamma", "Delta", "Epsilon")
@@ -25,6 +24,7 @@ class MyTestCase(unittest.TestCase):
         """
         这个方法，主要是介绍了一下子基建事情
         1. 用了run，会不停的处理
+           1. 如何在pipe中中断相应的操作。take_while
         2. do action的类似于java中的peek
         3. timer
         :return:
@@ -33,13 +33,21 @@ class MyTestCase(unittest.TestCase):
 
         def print_value(value):
             print("Next: {} \t({} ms)".format(value, millis_since(start)))
+            if value > 5:
+                return None
+            else:
+                return value
 
-        source = rx.timer(0, period=2).pipe(
-            ops.do_action(print_value)
+        def do_wile(value):
+            print("do while: {})".format(value))
+            return value is not None
+
+        source = rx.timer(0, period=0.5).pipe(
+            ops.map(print_value),
+            ops.take_while(do_wile)
         )
 
-        subscription = source.run()
-
+        source.run()
 
 
 if __name__ == '__main__':
