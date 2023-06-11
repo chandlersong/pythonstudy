@@ -1,1 +1,2 @@
+reactivex~=4.0.4
 loguru~=0.5.3
