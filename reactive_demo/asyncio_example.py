@@ -31,11 +31,11 @@ if __name__ == '__main__':
 
 
     async def main(loop):
-        done = asyncio.Future()
+        finish_event = asyncio.Event()
 
         def on_completed():
             print("completed")
-            done.set_result(0)
+            finish_event.set()
 
         disposable = from_aiter(ticker(1, 10), loop).subscribe(
             on_next=lambda i: print("next: {}".format(i)),
@@ -43,7 +43,7 @@ if __name__ == '__main__':
             on_completed=on_completed,
         )
 
-        await done
+        await finish_event.wait()
         disposable.dispose()
 
     loop = asyncio.get_event_loop()
