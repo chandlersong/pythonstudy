@@ -36,6 +36,35 @@ class MyTestCase(unittest.TestCase):
         composed.subscribe(lambda value: print("2nd Received {0}".format(value)))
         print("ok")
 
+    def test_something(self):
+        source = rx.of("Alpha", "Beta", "Gamma", "Delta", "Epsilon")
+
+        composed = source.pipe(
+            ops.map(lambda s: len(s)),
+            ops.filter(lambda i: i >= 5)
+        )
+        composed.subscribe(lambda value: print("Received {0}".format(value)))
+        print("ok")
+
+    def test_mulit_pip(self):
+        """
+        一次subscribe。pip会跑一次
+        :return:
+        """
+        source = rx.of("Alpha", "Beta", "Gamma", "Delta", "Epsilon")
+
+        composed = source.pipe(
+            ops.do_action(lambda s: print(f"1st，pip+{s}"))
+        )
+
+
+        composed = composed.pipe(
+            ops.do_action(lambda s: print(f"2nd,pip+{s}"))
+        )
+        composed.subscribe(lambda value: print("1st Received {0}".format(value)))
+        print("ok")
+
+
     def test_interval(self):
         """
         这个方法，主要是介绍了一下子基建事情
