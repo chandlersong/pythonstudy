@@ -34,12 +34,13 @@ class TestFutureStrategy(bt.Strategy):
         date = bt.num2date(self.data.datetime[0])
         logger.info(f'{date},当前可用资金 {self.broker.getcash()},close is {self.data[0]}')
         logger.info(f'{date},当前总资产 {self.broker.getvalue()}')
-        logger.info(f'{date} 当前持仓量 {self.broker.getposition(self.data).size}')
-
+        position = self.broker.getposition(self.data)
+        assert_value = position.size*(self.data.close[0]-position.price)
+        logger.info(f'{date} 当前持仓量 {position.size},价格：{position.price},持仓价值：{assert_value}')
         if date.day == 1:
-            self.sell(exectype=Order.Limit)
-        # if date.day == 2:
-        #     self.buy(size=2)
+            self.sell(exectype=Order.Limit, size=1)
+        if date.day == 2:
+            self.sell(exectype=Order.Limit, size=3)
 
 
 class FutureCase(unittest.TestCase):
