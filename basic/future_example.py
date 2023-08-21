@@ -7,10 +7,14 @@ from backtrader import Order
 from backtrader.feeds import PandasData
 from loguru import logger
 
+from basic.Indicators import ProfitIndicator
 from basic.future import FutureComm
 
 
 class TestFutureStrategy(bt.Strategy):
+
+    def __init__(self):
+        self.pnl_check = ProfitIndicator(self.data, broker=self.broker)
 
     def notify_order(self, order):
         if order.status in [order.Submitted, order.Accepted]:
@@ -31,11 +35,12 @@ class TestFutureStrategy(bt.Strategy):
             logger.info('Order Canceled/Margin/Rejected')
 
     def next(self):
+        logger.info(f"pnl:{self.pnl_check.pnl[0]}")
         date = bt.num2date(self.data.datetime[0])
         logger.info(f'{date},当前可用资金 {self.broker.getcash()},close is {self.data[0]}')
         logger.info(f'{date},当前总资产 {self.broker.getvalue()}')
         position = self.broker.getposition(self.data)
-        assert_value = position.size*(self.data.close[0]-position.price)
+        assert_value = position.size * (self.data.close[0] - position.price)
         logger.info(f'{date} 当前持仓量 {position.size},价格：{position.price},持仓价值：{assert_value}')
         if date.day == 1:
             self.sell(exectype=Order.Limit, size=1)
