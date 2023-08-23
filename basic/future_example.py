@@ -9,6 +9,7 @@ from loguru import logger
 
 from basic.Indicators import ProfitIndicator
 from basic.future import FutureComm
+from basic.my_observers import PNLObserver
 
 
 class TestFutureStrategy(bt.Strategy):
@@ -35,8 +36,10 @@ class TestFutureStrategy(bt.Strategy):
             logger.info('Order Canceled/Margin/Rejected')
 
     def next(self):
-        logger.info(f"pnl:{self.pnl_check.pnl[0]}")
         date = bt.num2date(self.data.datetime[0])
+        logger.info(f"{date},drawdown:{self.stats.drawdown.drawdown[0]}")
+        logger.info(f"{date},timeRetrun:{self.stats.timereturn.timereturn[0]}")
+        logger.info(f"{date},pnl:{self.stats.pnlobserver.pnl[0]}")
         logger.info(f'{date},当前可用资金 {self.broker.getcash()},close is {self.data[0]}')
         logger.info(f'{date},当前总资产 {self.broker.getvalue()}')
         position = self.broker.getposition(self.data)
@@ -57,6 +60,9 @@ class FutureCase(unittest.TestCase):
         cerebro = bt.Cerebro()
         broker = cerebro.broker
         broker.setcash(100.0)
+        cerebro.addobserver(bt.observers.DrawDown)
+        cerebro.addobserver(PNLObserver)
+        cerebro.addobserver(bt.observers.TimeReturn, timeframe=bt.TimeFrame.Days)
         broker.addcommissioninfo(FutureComm(leverage=2, commission=0.01))
         cerebro.adddata(compose_test_data(price))
         cerebro.addsizer(bt.sizers.PercentSizer, percents=95)

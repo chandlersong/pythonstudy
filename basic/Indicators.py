@@ -8,5 +8,4 @@ class ProfitIndicator(bt.Indicator):
 
     def next(self):
         position = self.p.broker.getposition(self.data)
-        assert_value = position.size * (self.data.close[0] - position.price)
-        self.lines.pnl[0] = assert_value
+        self.lines.pnl[0] = position.size * (self.data.close[0] - position.price)
